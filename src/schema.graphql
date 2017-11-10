@@ -1,0 +1,44 @@
+type Post {
+	id: ID!
+	title: String
+	description: String
+	created: Date
+	user: User
+	likes: [User]
+}
+
+type User {
+	id: ID!
+	displayName: String
+	phoneNumber: String!
+	avatar: Url
+	followers: [User]
+	posts: [Post]
+	notifications: [Notification]
+}
+
+type Notification {
+	id: ID!
+	type: String!
+	actor: User
+	user: User
+	meta: String!
+}
+
+scalar Url
+scalar Date
+
+type Query {
+	Post(id: ID!): Post
+	Posts(limit: Int, sortField: String, sortOrder: String): [Post]
+	User: User
+	Users(limit: Int, sortField: String, sortOrder: String): [User]
+}
+
+type Mutation {
+	createUser(displayName: String): User
+	createPost(userId: String! title: String description: String): Post
+	followUser(userId: String! subjectId: String!): User
+	deletePost(id: ID!): Post
+	likePost(id: ID!): Boolean
+}

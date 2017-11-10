@@ -1,0 +1,26 @@
+{
+  "name": "@flippa/api",
+  "version": "1.0.0",
+  "description": "flippa graphql api",
+  "main": "src/index.js",
+  "dependencies": {
+    "express": "4.16.2",
+    "express-graphql": "0.6.11",
+    "graphql": "0.11.7",
+    "graphql-tools": "2.7.2",
+    "knex": "0.13.0",
+    "mongodb": "2.2.33",
+    "nodemon": "1.12.1",
+    "pg": "7.4.0",
+    "pg-hstore": "2.3.2",
+    "sequelize": "4.22.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node src/index",
+    "dev": "nodemon src/index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "craig-mulligan",
+  "license": "ISC"
+}
