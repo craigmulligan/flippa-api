@@ -41,4 +41,6 @@ type Mutation {
 	followUser(userId: String! subjectId: String!): User
 	deletePost(id: ID!): Post
 	likePost(id: ID!): Boolean
+	login(phoneNumber: String!): Boolean
+	verifyCode(phoneNumber: String! verificationCode: String!): String
 }

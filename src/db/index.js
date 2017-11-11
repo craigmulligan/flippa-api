@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('postgresql://localhost:5432/flippa')
-const Model = {}
-const Promise = require('bluebird')
+const sequelize = new Sequelize(process.env.DB_CONNECTION)
 
 const NOTIFICATION_TYPES = {
   follow: 'FOLLOW',
@@ -19,8 +17,12 @@ const URL_TYPE = {
 
 const User = sequelize.define('user', {
   displayName: Sequelize.STRING,
-  phoneNumer: {
+  verificationCode: {
+    type: Sequelize.STRING
+  },
+  phoneNumber: {
     type: Sequelize.STRING,
+    unique: true
   },
   location: {
     type: Sequelize.STRING,
@@ -55,14 +57,14 @@ const Like = sequelize.define('like', {
     type: Sequelize.INTEGER,
     references: {
       model: User,
-      key: 'id',
+      key: 'id'
     }
   },
   postId: {
     type: Sequelize.INTEGER,
     references: {
       model: Post,
-      key: 'id',
+      key: 'id'
     }
   }
 })
@@ -72,14 +74,14 @@ const Follow = sequelize.define('follow', {
     type: Sequelize.INTEGER,
     references: {
       model: User,
-      key: 'id',
+      key: 'id'
     }
   },
   subjectId: {
     type: Sequelize.INTEGER,
     references: {
       model: User,
-      key: 'id',
+      key: 'id'
     }
   }
 })
@@ -92,7 +94,7 @@ const Nofitcation = sequelize.define('notification', {
     type: Sequelize.INTEGER,
     references: {
       model: User,
-      key: 'id',
+      key: 'id'
     }
   },
   meta: {
@@ -107,8 +109,8 @@ const Nofitcation = sequelize.define('notification', {
 
 const Category = sequelize.define('category', {
   title: {
-    type: Sequelize.TEXT,
-  },
+    type: Sequelize.TEXT
+  }
 })
 
 Post.belongsTo(User)
@@ -116,8 +118,7 @@ Post.belongsTo(Category)
 Nofitcation.belongsTo(User)
 Image.belongsTo(Post)
 
-
-Follow.addHook('afterCreate', 'follow', (follow, options) => {
+Follow.addHook('afterCreate', 'follow', (follow) => {
   Nofitcation.create({
     actorId: follow.userId,
     userId: follow.subjectId,
@@ -125,23 +126,13 @@ Follow.addHook('afterCreate', 'follow', (follow, options) => {
   })
 })
 
-Like.addHook('afterCreate', 'like', async (like, options) => {
-  const post = await Post.find({ where: { id : like.postId }})
+Like.addHook('afterCreate', 'like', async (like) => {
+  const post = await Post.find({ where: { id: like.postId } })
   Nofitcation.create({
     actorId: like.userId,
     userId: post.userId,
     type: NOTIFICATION_TYPES.like
   })
 })
-
-const Models = [
-  Post,
-  User,
-  Like,
-  Image,
-  Follow,
-  Category,
-  Nofitcation
-]
 
 module.exports = sequelize

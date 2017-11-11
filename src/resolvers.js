@@ -1,36 +1,29 @@
-const posts = [
-    { id: 1, author_id: 10, title: 'new shit', description: 'Lorem Ipsum', date: new Date() },
-    { id: 2, author_id: 11, title: 'old shit', description: 'Sic dolor amet', date: new Date() }
-]
-const authors = [
-    { id: 10, username: 'johndoe', first_name: 'John', last_name: 'Doe', phone_number: '+447479559980', avatar_url: 'http://acme.com/avatars/10' },
-    { id: 11, username: 'janedoe', first_name: 'Jane', last_name: 'Doe', phone_number: '+447479559980', avatar_url: 'http://acme.com/avatars/11' },
-]
+const { sendCode, getToken, isAdminOrSelf } = require('./auth')
 
 const resolvers = {
   Query: {
-    Posts: (_, __, context) => {
-      // console.log(context.db)
-      return context.db.models.post.findAll()
-    },
-    Post: (_, { id }, context) => context.pg.select().table('Post').where({ id: id }),
-    Users: (_, __, context) => {
-      // console.log(context.db)
-      return context.db.models.user.findAll()
-    },
+    Posts: (_, __, context) => context.db.models.post.findAll(),
+    Post: (_, { id }, context) => context.db.models.user.findById(id),
+    Users: (_, __, context) => context.db.models.user.findAll()
   },
   Post: {
     id: post => post.id,
     title: post => post.title,
     description: post => post.description,
-    user: (post, { id }, context)  => context.db.models.user.findById(post.userId),
+    user: (post, context) =>
+      context.db.models.user.findById(post.userId)
   },
   User: {
     posts: ({ id }, _, context) => {
-      return context.db.models.post.findAll()
+      return context.db.models.post.findAll({
+        where: {
+          userId: id
+        }
+      })
     },
-    notifications: ({ id }, _, context) => {
-      return context.db.models.notification.findAll({
+    notifications: async ({ id }, _, { db, user }) => {
+      await isAdminOrSelf(user, id)
+      return db.models.notification.findAll({
         where: {
           userId: id
         }
@@ -48,11 +41,31 @@ const resolvers = {
       return context.db.models.follow.create(data)
     },
     likePost: (_, data, context) => {
-      console.log('fire!')
       return context.db.models.like.create({
         postId: data.id,
         userId: '1'
       })
+    },
+    login: async (_, data, context) => {
+      const code = await sendCode(data.phoneNumber)
+      await context.db.models.user.upsert({
+        verificationCode: code,
+        phoneNumber: data.phoneNumber
+      })
+      return true
+    },
+    verifyCode: async (_, data, context) => {
+      const user = await context.db.models.user.findOne({
+        where: {
+          verificationCode: data.verificationCode,
+          phoneNumber: data.phoneNumber
+        }
+      })
+      if (user) {
+        return getToken(user.dataValues)
+      } else {
+        return null
+      }
     }
   }
 }
