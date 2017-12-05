@@ -7,6 +7,17 @@ type Post {
 	likes: [User]
 }
 
+input PostInput {
+	title: String
+	description: String
+	price: String
+}
+
+Type Follow {
+	subjectId: ID
+	userId: ID
+}
+
 type User {
 	id: ID!
 	displayName: String
@@ -48,8 +59,8 @@ type Query {
 
 type Mutation {
 	createUser(displayName: String): User
-	createPost(userId: String! title: String description: String): Post
-	followUser(userId: String! subjectId: String!): User
+	createPost(input: PostInput): Post
+	followUser(id: ID!): Follow
 	deletePost(id: ID!): Post
 	likePost(id: ID!): Boolean
 	login(phoneNumber: String!): Boolean

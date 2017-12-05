@@ -1,4 +1,4 @@
-const { sendCode, getToken, isAdminOrSelf } = require('./auth')
+const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
 const { upload } = require('./storage')
 
 const resolvers = {
@@ -22,10 +22,9 @@ const resolvers = {
         }
       })
     },
-    notifications: async ({ id }, args, ctx) => {
-      console.log('USER', ctx)
-      await isAdminOrSelf(ctx.user, id)
-      return ctx.db.models.notification.findAll({
+    notifications: async ({ id }, args, { user, db }) => {
+      isAdminOrSelf(user, id)
+      return db.models.notification.findAll({
         where: {
           userId: id
         }
@@ -33,19 +32,25 @@ const resolvers = {
     }
   },
   Mutation: {
-    createPost: (_, args, context) => {
-      return context.db.models.post.create(args)
+    createPost: async (_, { input }, { db, user }) => {
+      isLoggedIn(user)
+      return db.models.post.create({
+        ...input,
+        userId: user.id
+      })
     },
-    createUser: (_, args, context) => {
-      return context.db.models.user.create(args)
+    followUser: (_, { id }, { user, db }) => {
+      isLoggedIn(user)
+      return db.models.follow.create({
+        userId: user.id,
+        subjectId: id
+      })
     },
-    followUser: (_, args, context) => {
-      return context.db.models.follow.create(args)
-    },
-    likePost: (_, args, context) => {
-      return context.db.models.like.create({
+    likePost: (_, args, { user, db }) => {
+      isLoggedIn(user)
+      return db.models.like.create({
         postId: args.id,
-        userId: '1'
+        userId: user.id
       })
     },
     login: async (_, args, context) => {

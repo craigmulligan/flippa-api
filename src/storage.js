@@ -21,7 +21,8 @@ const processUpload = async upload => {
 }
 
 const storeUpload = ({ stream, filename, mimetype }) => {
-  return new Promise(function(resolve, reject) {
+  debug(`uploading ${filename}`)
+  return new Promise((resolve, reject) => {
     const file = bucket.file(filename)
     const rStream = file.createWriteStream({
       metadata: {

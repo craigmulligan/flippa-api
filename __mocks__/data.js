@@ -51,7 +51,12 @@ const notifications = [
   }
 ]
 
+const follow = []
+const like = []
+
 module.exports = {
   posts,
-  users
+  users,
+  follow,
+  like
 }
