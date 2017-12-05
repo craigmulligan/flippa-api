@@ -32,6 +32,25 @@ const users = [
   }
 ]
 
+const notifications = [
+  {
+    id: 0,
+    userId: 0,
+    type: 'follow',
+    actorId: 1,
+    meta: '',
+    read: false
+  },
+  {
+    id: 0,
+    userId: 0,
+    type: 'like',
+    actorId: 1,
+    meta: '',
+    read: false
+  }
+]
+
 module.exports = {
   posts,
   users

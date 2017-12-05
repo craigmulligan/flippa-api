@@ -1,6 +1,7 @@
 const {
   posts,
-  users
+  users,
+  notifications
 } = require('./data');
 
 module.exports = {
@@ -12,6 +13,9 @@ module.exports = {
     user: {
       findAll: () => Promise.resolve(users),
       findById: (id) => Promise.resolve(users.find(p => p.id === id))
+    },
+    notification: {
+      findAll: () => Promise.resolve(notifications),
     }
   }
 }

@@ -1,10 +1,11 @@
 const { sendCode, getToken, isAdminOrSelf } = require('./auth')
+const { upload } = require('./storage')
 
 const resolvers = {
   Query: {
-    Posts: (_, __, context) => context.db.models.post.findAll(),
+    Posts: (_, args, context) => context.db.models.post.findAll(),
     Post: (_, { id }, context) => context.db.models.post.findById(id),
-    Users: (_, __, context) => context.db.models.user.findAll(),
+    Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, context) => context.db.models.user.findById(id)
   },
   Post: {
@@ -14,16 +15,17 @@ const resolvers = {
     user: (post, context) => context.db.models.user.findById(post.userId)
   },
   User: {
-    posts: ({ id }, _, context) => {
+    posts: ({ id }, args, context) => {
       return context.db.models.post.findAll({
         where: {
           userId: id
         }
       })
     },
-    notifications: async ({ id }, _, { db, user }) => {
-      await isAdminOrSelf(user, id)
-      return db.models.notification.findAll({
+    notifications: async ({ id }, args, ctx) => {
+      console.log('USER', ctx)
+      await isAdminOrSelf(ctx.user, id)
+      return ctx.db.models.notification.findAll({
         where: {
           userId: id
         }
@@ -31,34 +33,34 @@ const resolvers = {
     }
   },
   Mutation: {
-    createPost: (_, data, context) => {
-      return context.db.models.post.create(data)
+    createPost: (_, args, context) => {
+      return context.db.models.post.create(args)
     },
-    createUser: (_, data, context) => {
-      return context.db.models.user.create(data)
+    createUser: (_, args, context) => {
+      return context.db.models.user.create(args)
     },
-    followUser: (_, data, context) => {
-      return context.db.models.follow.create(data)
+    followUser: (_, args, context) => {
+      return context.db.models.follow.create(args)
     },
-    likePost: (_, data, context) => {
+    likePost: (_, args, context) => {
       return context.db.models.like.create({
-        postId: data.id,
+        postId: args.id,
         userId: '1'
       })
     },
-    login: async (_, data, context) => {
-      const code = await sendCode(data.phoneNumber)
+    login: async (_, args, context) => {
+      const code = await sendCode(args.phoneNumber)
       await context.db.models.user.upsert({
         verificationCode: code,
-        phoneNumber: data.phoneNumber
+        phoneNumber: args.phoneNumber
       })
       return true
     },
-    verifyCode: async (_, data, context) => {
+    verifyCode: async (_, args, context) => {
       const user = await context.db.models.user.findOne({
         where: {
-          verificationCode: data.verificationCode,
-          phoneNumber: data.phoneNumber
+          verificationCode: args.verificationCode,
+          phoneNumber: args.phoneNumber
         }
       })
       if (user) {
@@ -66,6 +68,12 @@ const resolvers = {
       } else {
         return null
       }
+    },
+    singleUpload: async (_, args, context) => {
+      const { url } = await upload(args)
+      return context.db.models.file.upsert({
+        url
+      })
     }
   }
 }

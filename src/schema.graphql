@@ -27,12 +27,23 @@ type Notification {
 
 scalar Url
 scalar Date
+# this is needed for upload to work
+scalar Upload
+
+type File {
+  id: ID!
+  url: String!
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
 
 type Query {
 	Post(id: ID!): Post
 	Posts(limit: Int, sortField: String, sortOrder: String): [Post]
-	User: User
+	User(id: ID!): User
 	Users(limit: Int, sortField: String, sortOrder: String): [User]
+	uploads: [File]
 }
 
 type Mutation {
@@ -43,4 +54,6 @@ type Mutation {
 	likePost(id: ID!): Boolean
 	login(phoneNumber: String!): Boolean
 	verifyCode(phoneNumber: String! verificationCode: String!): String
+	singleUpload (file: Upload!): File!
+  multipleUpload (files: [Upload!]!): [File!]!
 }

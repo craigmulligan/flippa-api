@@ -6,4 +6,12 @@ API for flippa app
 
 Usage:
 
-todo
+Query explorer:
+```
+http://localhost:8080/playground
+```
+
+api:
+```
+http://localhost:8080/graphql 
+```

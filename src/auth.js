@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken')
 const jwtMiddleware = require('express-jwt')
 const constants = require('./constants')
-const twilio = require('twilio')(
-  constants.TWILIO_SSID,
-  constants.TWILIO_TOKEN
-)
+const twilio = require('twilio')(constants.TWILIO_SSID, constants.TWILIO_TOKEN)
 
 const fromNumber = constants.TWILIO_FROM
 const SECRET = constants.SECRET
