@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken')
 const jwtMiddleware = require('express-jwt')
+const constants = require('./constants')
 const twilio = require('twilio')(
-  process.env.TWILIO_SSID,
-  process.env.TWILIO_TOKEN
+  constants.TWILIO_SSID,
+  constants.TWILIO_TOKEN
 )
-const fromNumber = process.env.TWILIO_FROM
-const SECRET = process.env.SECRET
+
+const fromNumber = constants.TWILIO_FROM
+const SECRET = constants.SECRET
 
 const isAdminOrSelf = (user, id) => {
   if (!user.isAdmin && user.id !== id) {
