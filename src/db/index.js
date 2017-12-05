@@ -46,7 +46,7 @@ const Post = sequelize.define('post', {
   }
 })
 
-const Image = sequelize.define('image', {
+const File = sequelize.define('file', {
   url: URL_TYPE,
   small: URL_TYPE,
   medium: URL_TYPE,
@@ -117,7 +117,7 @@ const Category = sequelize.define('category', {
 Post.belongsTo(User)
 Post.belongsTo(Category)
 Nofitcation.belongsTo(User)
-Image.belongsTo(Post)
+File.belongsTo(Post)
 
 Follow.addHook('afterCreate', 'follow', follow => {
   Nofitcation.create({

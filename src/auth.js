@@ -12,6 +12,12 @@ const isAdminOrSelf = (user, id) => {
   }
 }
 
+const isLoggedIn = user => {
+  if (!user) {
+    throw Error('Unauthorized: Please login')
+  }
+}
+
 const sendCode = async phoneNumber => {
   const code = Math.floor(Math.random() * 999999 + 111111)
   await twilio.messages.create({
@@ -31,5 +37,6 @@ module.exports = {
   sendCode,
   isAdminOrSelf,
   middleware,
-  getToken
+  getToken,
+  isLoggedIn
 }
