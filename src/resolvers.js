@@ -10,8 +10,7 @@ const resolvers = {
     id: post => post.id,
     title: post => post.title,
     description: post => post.description,
-    user: (post, context) =>
-      context.db.models.user.findById(post.userId)
+    user: (post, context) => context.db.models.user.findById(post.userId)
   },
   User: {
     posts: ({ id }, _, context) => {

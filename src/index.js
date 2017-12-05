@@ -36,10 +36,7 @@ const start = async () => {
 
     // the multer accessing the key 'image', as defined in the `FormData` object on the front end
     // Passing the uploadToGcs function as middleware to handle the uploading of req.file
-    app.post('/upload', multer.single('image'), storage, function(
-      req,
-      res
-    ) {
+    app.post('/upload', multer.single('image'), storage, function(req, res) {
       const data = req.body
       if (req.file && req.file.cloudStoragePublicUrl) {
         data.imageUrl = req.file.cloudStoragePublicUrl
@@ -61,7 +58,7 @@ const start = async () => {
         res.status(401).send('invalid token...')
       }
 
-      debug(err);
+      debug(err)
       res.status(500).send(err)
     })
 

@@ -118,7 +118,7 @@ Post.belongsTo(Category)
 Nofitcation.belongsTo(User)
 Image.belongsTo(Post)
 
-Follow.addHook('afterCreate', 'follow', (follow) => {
+Follow.addHook('afterCreate', 'follow', follow => {
   Nofitcation.create({
     actorId: follow.userId,
     userId: follow.subjectId,
@@ -126,7 +126,7 @@ Follow.addHook('afterCreate', 'follow', (follow) => {
   })
 })
 
-Like.addHook('afterCreate', 'like', async (like) => {
+Like.addHook('afterCreate', 'like', async like => {
   const post = await Post.find({ where: { id: like.postId } })
   Nofitcation.create({
     actorId: like.userId,

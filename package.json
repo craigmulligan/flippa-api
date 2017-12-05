@@ -1,6 +1,6 @@
 {
   "name": "@flippa/api",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "flippa graphql api",
   "main": "src/index.js",
   "dependencies": {
@@ -35,8 +35,16 @@
     "prettier-check": "prettier-check --single-quote --no-semi --write 'src/**/*.js'",
     "prettier": "prettier --single-quote --no-semi --write 'src/**/*.js'",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
+    "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "hobochild",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hobochild/flippa-api.git"
+  },
+  "release": {
+    "publish": "@semantic-release/github"
+  }
 }
