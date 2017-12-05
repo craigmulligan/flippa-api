@@ -6,12 +6,12 @@ notifications:
   email: false
 node_js:
   - '7'
-  - '8'
 before_script:
   - npm prune
 script:
   - npm run prettier-check
   - npm run lint
+  - npm test
 after_success:
   - npm run semantic-release
 branches:
