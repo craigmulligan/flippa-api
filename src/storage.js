@@ -1,12 +1,13 @@
 // https://medium.com/google-cloud/upload-images-to-google-cloud-storage-with-react-native-and-expressjs-61b8874abc49
 const storage = require('@google-cloud/storage')
+const constants = require('./constants')
 
 const gcs = storage({
-  projectId: process.env.GCS_PROJECT_ID,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+  projectId: constants.GCS_PROJECT_ID,
+  keyFilename: constants.GOOGLE_APPLICATION_CREDENTIALS
 })
 
-const bucketName = process.env.GCS_BUCKET
+const bucketName = constants.GCS_BUCKET
 const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {

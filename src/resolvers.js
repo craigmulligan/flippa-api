@@ -3,8 +3,9 @@ const { sendCode, getToken, isAdminOrSelf } = require('./auth')
 const resolvers = {
   Query: {
     Posts: (_, __, context) => context.db.models.post.findAll(),
-    Post: (_, { id }, context) => context.db.models.user.findById(id),
-    Users: (_, __, context) => context.db.models.user.findAll()
+    Post: (_, { id }, context) => context.db.models.post.findById(id),
+    Users: (_, __, context) => context.db.models.user.findAll(),
+    User: (_, { id }, context) => context.db.models.user.findById(id)
   },
   Post: {
     id: post => post.id,
