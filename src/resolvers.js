@@ -1,18 +1,26 @@
 const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
-const { upload } = require('./storage')
+const upload = require('./storage')
 
 const resolvers = {
   Query: {
     Posts: (_, args, context) => context.db.models.post.findAll(),
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
-    User: (_, { id }, context) => context.db.models.user.findById(id)
+    User: (_, { id }, context) => context.db.models.user.findById(id),
+    Files: (_, args, context) => context.db.models.file.findAll()
   },
   Post: {
     id: post => post.id,
     title: post => post.title,
     description: post => post.description,
-    user: (post, context) => context.db.models.user.findById(post.userId)
+    user: (post, args, context) => context.db.models.user.findById(post.userId),
+    file: (post, args, context) => {
+      if (post.fileId) {
+        return context.db.models.file.findById(post.fileId)
+      } else {
+        return ''
+      }
+    },
   },
   User: {
     posts: ({ id }, args, context) => {
@@ -74,11 +82,10 @@ const resolvers = {
         return null
       }
     },
-    singleUpload: async (_, args, context) => {
-      const { url } = await upload(args)
-      return context.db.models.file.upsert({
-        url
-      })
+    singleUpload: async (_, { file }, context) => {
+      const data = await upload(file)
+      console.log('upload done', data)
+      return context.db.models.file.create(data)
     }
   }
 }

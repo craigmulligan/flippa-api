@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "node src/index",
-    "dev": "nodemon src/index",
+    "dev": "DEBUG=* nodemon src/index",
     "test": "jest",
     "lint": "eslint './src/**/*.js'",
     "prettier-check": "prettier-check --single-quote --no-semi --write 'src/**/*.js'",
