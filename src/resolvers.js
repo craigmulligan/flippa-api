@@ -6,7 +6,10 @@ const resolvers = {
     Posts: (_, args, context) => context.db.models.post.findAll(),
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
-    User: (_, { id }, context) => context.db.models.user.findById(id),
+    User: (_, { id }, { user, db }) => {
+      const uid = id ? id : user.id
+      return db.models.user.findById(uid)
+    },
     Files: (_, args, context) => context.db.models.file.findAll()
   },
   Post: {
@@ -40,13 +43,18 @@ const resolvers = {
     }
   },
   Mutation: {
+    updateUser: async (_, { input }, { db, user }) => {
+      isLoggedIn(user)
+      return db.models.user.update(input, { where: { id: user.id } })
+    },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
-      return db.models.post.create({
+      return db.models.user.create({
         ...input,
         userId: user.id
       })
     },
+
     followUser: (_, { id }, { user, db }) => {
       isLoggedIn(user)
       return db.models.follow.create({
