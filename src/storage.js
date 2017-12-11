@@ -22,6 +22,12 @@ const processUpload = async upload => {
 
 const storeUpload = ({ stream, filename, mimetype }) => {
   debug(`uploading ${filename}`)
+  debug({
+    stream,
+    filename,
+    mimetype
+  })
+
   return new Promise((resolve, reject) => {
     const file = bucket.file(filename)
     const rStream = file.createWriteStream({
@@ -35,9 +41,7 @@ const storeUpload = ({ stream, filename, mimetype }) => {
       .on('finish', () => {
         resolve({ filename, url: getPublicUrl(filename) })
       })
-      .on('error', err => {
-        reject(err)
-      })
+      .on('error', reject)
   })
 }
 
