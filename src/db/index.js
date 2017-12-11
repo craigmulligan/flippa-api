@@ -7,24 +7,6 @@ const NOTIFICATION_TYPES = {
   like: 'LIKE'
 }
 
-const URL_TYPE = {
-  type: Sequelize.STRING,
-  validate: {
-    isUrl: true
-  },
-  allowNull: true,
-  defaultValue: null
-}
-
-const FILE_TYPE = {
-  type: Sequelize.Object,
-  validate: {
-    isUrl: true
-  },
-  allowNull: true,
-  defaultValue: null
-}
-
 const User = sequelize.define('user', {
   displayName: Sequelize.STRING,
   verificationCode: {
@@ -59,7 +41,7 @@ const Post = sequelize.define('post', {
   }
 })
 
-const File = sequelize.define('file', {
+sequelize.define('file', {
   url: Sequelize.STRING
 })
 
@@ -127,7 +109,6 @@ const Category = sequelize.define('category', {
 Post.belongsTo(User)
 Post.belongsTo(Category)
 Nofitcation.belongsTo(User)
-// File.belongsTo(Post)
 
 Follow.addHook('afterCreate', 'follow', follow => {
   Nofitcation.create({

@@ -28,10 +28,6 @@ const start = async () => {
     }
 
     const server = new GraphQLServer({ typeDefs, resolvers, context, options })
-    server.express.use((req, res, next) => {
-      console.log(req.headers)
-      next()
-    })
     server.express.use(middleware)
     server.start(() => debug(`Server is running on localhost:${options.port}`))
   } catch (err) {

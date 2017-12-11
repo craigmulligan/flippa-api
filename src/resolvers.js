@@ -20,7 +20,7 @@ const resolvers = {
       } else {
         return ''
       }
-    },
+    }
   },
   User: {
     posts: ({ id }, args, context) => {
@@ -84,7 +84,6 @@ const resolvers = {
     },
     singleUpload: async (_, { file }, context) => {
       const data = await upload(file)
-      console.log('upload done', data)
       return context.db.models.file.create(data)
     }
   }
