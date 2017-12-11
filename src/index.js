@@ -10,16 +10,15 @@ const { middleware } = require('./auth')
 
 const start = async () => {
   try {
-    const db = await DB.sync()
+    const db = await DB.sync({ force: false })
 
     const schemaFile = path.join(__dirname, 'schema.graphql')
     const typeDefs = fs.readFileSync(schemaFile, 'utf8')
 
     const options = {
+      // cors: { origin: false },
       disableSubscriptions: true, // same as default value
       port: 8080,
-      endoint: '/graphql',
-      subscriptionsEndpoint: '/subscriptions',
       playgroundEndpoint: '/playground',
       disablePlayground: false // same as default value
     }

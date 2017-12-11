@@ -5,15 +5,17 @@ type Post {
 	created: Date
 	user: User
 	likes: [User]
+	file: File
 }
 
 input PostInput {
 	title: String
 	description: String
 	price: String
+	fileId: String
 }
 
-Type Follow {
+type Follow {
 	subjectId: ID
 	userId: ID
 }
@@ -43,10 +45,10 @@ scalar Upload
 
 type File {
   id: ID!
-  url: String!
-  filename: String!
-  mimetype: String!
-  encoding: String!
+  url: String
+  filename: String
+  mimetype: String
+  encoding: String
 }
 
 type Query {
@@ -54,7 +56,7 @@ type Query {
 	Posts(limit: Int, sortField: String, sortOrder: String): [Post]
 	User(id: ID!): User
 	Users(limit: Int, sortField: String, sortOrder: String): [User]
-	uploads: [File]
+	Files: [File]
 }
 
 type Mutation {
