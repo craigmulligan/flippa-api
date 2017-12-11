@@ -19,7 +19,7 @@ const isLoggedIn = user => {
 }
 
 const sendCode = async phoneNumber => {
-  const code = Math.floor(Math.random() * 999999 + 111111)
+  const code = Math.floor(1000 + Math.random() * 9000)
   await twilio.messages.create({
     to: phoneNumber,
     from: fromNumber,
