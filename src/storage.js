@@ -2,6 +2,7 @@
 const storage = require('@google-cloud/storage')
 const constants = require('./constants')
 const debug = require('debug')('storage')
+const { createWriteStream } = require('fs')
 
 const gcs = storage({
   projectId: constants.GCS_PROJECT_ID,
@@ -9,6 +10,7 @@ const gcs = storage({
 })
 
 const bucketName = constants.GCS_BUCKET
+console.log(bucketName)
 const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {
@@ -36,6 +38,7 @@ const storeUpload = ({ stream, filename, mimetype }) => {
       }
     })
 
+    fsStream = createWriteStream('./photo.jpg')
     stream
       .pipe(rStream)
       .on('finish', () => {

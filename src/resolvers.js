@@ -1,9 +1,20 @@
 const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
 const upload = require('./storage')
+const QUERY_DEFUALTS = {
+  sortOrder: 'DESC',
+  sortField: 'createdAt',
+  limit: 10,
+  offset: 0
+}
 
 const resolvers = {
   Query: {
-    Posts: (_, args, context) => context.db.models.post.findAll(),
+    Posts: (_, args, context) => {
+      context.db.models.post.findAll({
+        ...QUERY_DEFUALTS, 
+        ...arg
+      })
+    },
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
@@ -49,7 +60,7 @@ const resolvers = {
     },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
-      return db.models.user.create({
+      return db.models.post.create({
         ...input,
         userId: user.id
       })
