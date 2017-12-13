@@ -1,4 +1,5 @@
 const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
+// const debug = require('debug')('resolvers')
 const upload = require('./storage')
 const QUERY_DEFUALTS = {
   sortOrder: 'DESC',
@@ -11,23 +12,24 @@ const resolvers = {
   Query: {
     Posts: (_, args, context) => {
       return context.db.models.post.findAll({
-        ...QUERY_DEFUALTS, 
+        ...QUERY_DEFUALTS,
         ...args
       })
     },
     Feed: async (_, args, { user, db }) => {
       isLoggedIn(user)
-      following = await db.models.user.findById(user.id)
+      const following = await db.models.user
+        .findById(user.id)
         .then(u => u.getFollowing())
         .then(f => f.map(x => x.get().id))
 
       return db.models.post.findAll({
-        ...QUERY_DEFUALTS, 
+        ...QUERY_DEFUALTS,
         ...{
           where: {
             userId: {
-              [context.db.Op.any]: following
-            } 
+              [db.Op.any]: following
+            }
           }
         },
         ...args
@@ -37,7 +39,6 @@ const resolvers = {
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
       const uid = id ? id : user.id
-      console.log(user)
       return db.models.user.findById(uid)
     },
     Files: (_, args, context) => context.db.models.file.findAll()
@@ -54,29 +55,28 @@ const resolvers = {
         return ''
       }
     },
-    likes: (post, args, { user, db }) => {
-      return db.models.post.findById(post.id)
-        .then((p => {
-          return p.getLikes()
-        }))
+    likes: (post, args, { db }) => {
+      return db.models.post.findById(post.id).then(p => {
+        return p.getLikes()
+      })
     }
   },
   User: {
-    posts: ({ id }, args, { user, db }) => {
+    posts: ({ id }, args, { db }) => {
       return db.models.post.findAll({
         where: {
           userId: id
         }
       })
     },
-    followers: (u, args, { db, user }) => {
+    followers: (u) => {
       return u.getFollowers()
     },
-    following: (u, args, { db, user }) => {
+    following: (u) => {
       return u.getFollowing()
     },
-    likes: (u, args, context) => {
-      return u.getLikes()   
+    likes: (u) => {
+      return u.getLikes()
     },
     notifications: async ({ id }, args, { user, db }) => {
       isAdminOrSelf(user, id)
@@ -108,10 +108,9 @@ const resolvers = {
     },
     likePost: (_, args, { user, db }) => {
       isLoggedIn(user)
-      console.log(args.i)
       return db.models.like.create({
         postId: args.id,
-        userId: user.id 
+        userId: user.id
       })
     },
     login: async (_, args, context) => {

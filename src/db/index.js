@@ -52,10 +52,10 @@ const Like = sequelize.define('like', {
     autoIncrement: true
   },
   userId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.INTEGER
   },
   postId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.INTEGER
   }
 })
 
@@ -66,10 +66,10 @@ const Follow = sequelize.define('follow', {
     autoIncrement: true
   },
   userId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.INTEGER
   },
   subjectId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.INTEGER
   }
 })
 
@@ -98,25 +98,41 @@ Post.belongsTo(Category)
 
 Notification.belongsTo(User)
 
-Post.belongsToMany(User, { as: 'likes', foreignKey: 'postId', through: {
-  model: Like
-}})
+Post.belongsToMany(User, {
+  as: 'likes',
+  foreignKey: 'postId',
+  through: {
+    model: Like
+  }
+})
 
-User.belongsToMany(Post, { as: 'likes', foreignKey: 'userId', through: {
-  model: Like
-}})
+User.belongsToMany(Post, {
+  as: 'likes',
+  foreignKey: 'userId',
+  through: {
+    model: Like
+  }
+})
 
-User.belongsToMany(User, { as: 'followers', foreignKey: 'subjectId', through: {
-  model: Follow
-}});
+User.belongsToMany(User, {
+  as: 'followers',
+  foreignKey: 'subjectId',
+  through: {
+    model: Follow
+  }
+})
 
-User.belongsToMany(User, { as: 'following', foreignKey: 'userId', through: {
-  model: Follow
-}});
+User.belongsToMany(User, {
+  as: 'following',
+  foreignKey: 'userId',
+  through: {
+    model: Follow
+  }
+})
 
 Follow.addHook('afterCreate', 'follow', follow => {
   Notification.create({
-    actorId: follow.userId,
+    actorId: follow.userId
   })
 })
 

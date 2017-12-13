@@ -9,7 +9,6 @@ const gcs = storage({
 })
 
 const bucketName = constants.GCS_BUCKET
-console.log(bucketName)
 const bucket = gcs.bucket(bucketName)
 
 function getPublicUrl(filename) {
@@ -18,7 +17,6 @@ function getPublicUrl(filename) {
 
 const processUpload = async ({ file, user }) => {
   const data = await file
-  console.log(data)
   return await storeUpload({
     ...data,
     user
@@ -33,7 +31,7 @@ const storeUpload = ({ stream, filename, mimetype, user }) => {
     filename,
     mimetype
   })
-  
+
   return new Promise((resolve, reject) => {
     const file = bucket.file(uploadPath)
     const rStream = file.createWriteStream({
