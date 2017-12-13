@@ -17,6 +17,7 @@
     "twilio": "3.9.2"
   },
   "devDependencies": {
+    "chance": "^1.0.12",
     "eslint": "^4.12.1",
     "eslint-config-prettier": "2.9.0",
     "jest": "^21.2.1",

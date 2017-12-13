@@ -46,36 +46,30 @@ sequelize.define('file', {
 })
 
 const Like = sequelize.define('like', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   userId: {
     type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
   },
   postId: {
     type: Sequelize.INTEGER,
-    references: {
-      model: Post,
-      key: 'id'
-    }
   }
 })
 
 const Follow = sequelize.define('follow', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   userId: {
     type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
   },
   subjectId: {
     type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
   }
 })
 
@@ -108,7 +102,26 @@ const Category = sequelize.define('category', {
 
 Post.belongsTo(User)
 Post.belongsTo(Category)
+
 Nofitcation.belongsTo(User)
+
+//Like.belongsTo(Post)
+
+Post.belongsToMany(User, { as: 'likes', foreignKey: 'postId', through: {
+  model: Like
+}})
+
+User.belongsToMany(Post, { as: 'likes', foreignKey: 'userId', through: {
+  model: Like
+}})
+
+User.belongsToMany(User, { as: 'followers', foreignKey: 'subjectId', through: {
+  model: Follow
+}});
+
+User.belongsToMany(User, { as: 'following', foreignKey: 'userId', through: {
+  model: Follow
+}});
 
 Follow.addHook('afterCreate', 'follow', follow => {
   Nofitcation.create({

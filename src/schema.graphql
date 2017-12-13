@@ -3,7 +3,7 @@ type Post {
 	title: String
 	description: String
   price: String
-	createdAt: Date
+	createdAt: String! 
 	user: User
 	likes: [User]
 	file: File
@@ -32,7 +32,9 @@ type User {
 	displayName: String
 	phoneNumber: String
 	avatar: Url
+  following: [User]
 	followers: [User]
+  likes: [Post]
 	posts: [Post]
 	notifications: [Notification]
 }

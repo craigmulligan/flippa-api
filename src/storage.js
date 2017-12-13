@@ -2,7 +2,6 @@
 const storage = require('@google-cloud/storage')
 const constants = require('./constants')
 const debug = require('debug')('storage')
-const { createWriteStream } = require('fs')
 
 const gcs = storage({
   projectId: constants.GCS_PROJECT_ID,
@@ -17,32 +16,36 @@ function getPublicUrl(filename) {
   return 'https://storage.googleapis.com/' + bucketName + '/' + filename
 }
 
-const processUpload = async upload => {
-  const data = await upload
-  return await storeUpload(data)
+const processUpload = async ({ file, user }) => {
+  const data = await file
+  console.log(data)
+  return await storeUpload({
+    ...data,
+    user
+  })
 }
 
-const storeUpload = ({ stream, filename, mimetype }) => {
-  debug(`uploading ${filename}`)
+const storeUpload = ({ stream, filename, mimetype, user }) => {
+  const uploadPath = `${user.id}/${filename}`
+  debug(`uploading ${uploadPath}`)
   debug({
     stream,
     filename,
     mimetype
   })
-
+  
   return new Promise((resolve, reject) => {
-    const file = bucket.file(filename)
+    const file = bucket.file(uploadPath)
     const rStream = file.createWriteStream({
       metadata: {
         contentType: mimetype
       }
     })
 
-    fsStream = createWriteStream('./photo.jpg')
     stream
       .pipe(rStream)
       .on('finish', () => {
-        resolve({ filename, url: getPublicUrl(filename) })
+        resolve({ filename, url: getPublicUrl(uploadPath) })
       })
       .on('error', reject)
   })

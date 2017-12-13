@@ -3,22 +3,23 @@ const upload = require('./storage')
 const QUERY_DEFUALTS = {
   sortOrder: 'DESC',
   sortField: 'createdAt',
-  limit: 10,
+  limit: 100,
   offset: 0
 }
 
 const resolvers = {
   Query: {
     Posts: (_, args, context) => {
-      context.db.models.post.findAll({
+      return context.db.models.post.findAll({
         ...QUERY_DEFUALTS, 
-        ...arg
+        ...args
       })
     },
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
       const uid = id ? id : user.id
+      console.log(user)
       return db.models.user.findById(uid)
     },
     Files: (_, args, context) => context.db.models.file.findAll()
@@ -34,15 +35,27 @@ const resolvers = {
       } else {
         return ''
       }
+    },
+    likes: ({ getLikes }, args, { user, db }) => {
+      return getLikes()
     }
   },
   User: {
-    posts: ({ id }, args, context) => {
-      return context.db.models.post.findAll({
+    posts: ({ id }, args, { user, db }) => {
+      return db.models.post.findAll({
         where: {
           userId: id
         }
       })
+    },
+    followers: ({ getFollowers }, args, { db, user }) => {
+      return getFollowers()
+    },
+    following: ({ getFollowing }, args, { db, user }) => {
+      return getFollowing()
+    },
+    likes: ({ getLikes }, args, context) => {
+      return getLikes()   
     },
     notifications: async ({ id }, args, { user, db }) => {
       isAdminOrSelf(user, id)
@@ -65,7 +78,6 @@ const resolvers = {
         userId: user.id
       })
     },
-
     followUser: (_, { id }, { user, db }) => {
       isLoggedIn(user)
       return db.models.follow.create({
@@ -74,10 +86,11 @@ const resolvers = {
       })
     },
     likePost: (_, args, { user, db }) => {
-      isLoggedIn(user)
+      //isLoggedIn(user)
+      console.log(args.i)
       return db.models.like.create({
         postId: args.id,
-        userId: user.id
+        userId: 1 
       })
     },
     login: async (_, args, context) => {
@@ -101,9 +114,12 @@ const resolvers = {
         return null
       }
     },
-    singleUpload: async (_, { file }, context) => {
-      const data = await upload(file)
-      return context.db.models.file.create(data)
+    singleUpload: async (_, { file }, { user, db }) => {
+      const data = await upload({
+        file,
+        user
+      })
+      return db.models.file.create(data)
     }
   }
 }
