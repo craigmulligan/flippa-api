@@ -69,13 +69,13 @@ const resolvers = {
         }
       })
     },
-    followers: (u) => {
+    followers: u => {
       return u.getFollowers()
     },
-    following: (u) => {
+    following: u => {
       return u.getFollowing()
     },
-    likes: (u) => {
+    likes: u => {
       return u.getLikes()
     },
     notifications: async ({ id }, args, { user, db }) => {
