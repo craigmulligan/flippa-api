@@ -36,8 +36,11 @@ const resolvers = {
         return ''
       }
     },
-    likes: ({ getLikes }, args, { user, db }) => {
-      return getLikes()
+    likes: (post, args, { user, db }) => {
+      return db.models.post.findById(post.id)
+        .then((p => {
+          return p.getLikes()
+        }))
     }
   },
   User: {
@@ -48,14 +51,14 @@ const resolvers = {
         }
       })
     },
-    followers: ({ getFollowers }, args, { db, user }) => {
-      return getFollowers()
+    followers: (u, args, { db, user }) => {
+      return u.getFollowers()
     },
-    following: ({ getFollowing }, args, { db, user }) => {
-      return getFollowing()
+    following: (u, args, { db, user }) => {
+      return u.getFollowing()
     },
-    likes: ({ getLikes }, args, context) => {
-      return getLikes()   
+    likes: (u, args, context) => {
+      return u.getLikes()   
     },
     notifications: async ({ id }, args, { user, db }) => {
       isAdminOrSelf(user, id)

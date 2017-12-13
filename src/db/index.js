@@ -73,16 +73,9 @@ const Follow = sequelize.define('follow', {
   }
 })
 
-const Nofitcation = sequelize.define('notification', {
+const Notification = sequelize.define('notification', {
   type: {
     type: Sequelize.STRING
-  },
-  actorId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
   },
   meta: {
     type: Sequelize.JSONB,
@@ -103,9 +96,7 @@ const Category = sequelize.define('category', {
 Post.belongsTo(User)
 Post.belongsTo(Category)
 
-Nofitcation.belongsTo(User)
-
-//Like.belongsTo(Post)
+Notification.belongsTo(User)
 
 Post.belongsToMany(User, { as: 'likes', foreignKey: 'postId', through: {
   model: Like
@@ -124,16 +115,14 @@ User.belongsToMany(User, { as: 'following', foreignKey: 'userId', through: {
 }});
 
 Follow.addHook('afterCreate', 'follow', follow => {
-  Nofitcation.create({
+  Notification.create({
     actorId: follow.userId,
-    userId: follow.subjectId,
-    type: NOTIFICATION_TYPES.follow
   })
 })
 
 Like.addHook('afterCreate', 'like', async like => {
   const post = await Post.find({ where: { id: like.postId } })
-  Nofitcation.create({
+  Notification.create({
     actorId: like.userId,
     userId: post.userId,
     type: NOTIFICATION_TYPES.like
