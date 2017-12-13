@@ -15,6 +15,24 @@ const resolvers = {
         ...args
       })
     },
+    Feed: async (_, args, { user, db }) => {
+      isLoggedIn(user)
+      following = await db.models.user.findById(user.id)
+        .then(u => u.getFollowing())
+        .then(f => f.map(x => x.get().id))
+
+      return db.models.post.findAll({
+        ...QUERY_DEFUALTS, 
+        ...{
+          where: {
+            userId: {
+              [context.db.Op.any]: following
+            } 
+          }
+        },
+        ...args
+      })
+    },
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
@@ -89,11 +107,11 @@ const resolvers = {
       })
     },
     likePost: (_, args, { user, db }) => {
-      //isLoggedIn(user)
+      isLoggedIn(user)
       console.log(args.i)
       return db.models.like.create({
         postId: args.id,
-        userId: 1 
+        userId: user.id 
       })
     },
     login: async (_, args, context) => {
