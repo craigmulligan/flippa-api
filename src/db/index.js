@@ -77,24 +77,28 @@ const Notification = sequelize.define('notification', {
   sourceType: {
     type: Sequelize.STRING
   },
-  sourceId: {
-    type: Sequelize.INTEGER,
-    allowNull: true
-  },
   read: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
   }
 })
 
-const Category = sequelize.define('category', {
+User.hasMany(Post)
+
+const Tag = sequelize.define('tag', {
   title: {
-    type: Sequelize.TEXT
+    type: Sequelize.STRING,
+    unique: true
   }
 })
 
-Post.belongsTo(User)
-Post.belongsTo(Category)
+Post.belongsToMany(Tag, {
+  through: 'tagConnection' 
+})
+
+Tag.belongsToMany(Post, {
+  through: 'tagConnection'
+});
 
 Notification.belongsTo(User)
 Notification.belongsTo(User, {

@@ -10,6 +10,9 @@ const QUERY_DEFUALTS = {
 
 const resolvers = {
   Query: {
+    Tags: (_, args, context) => {
+      return context.db.models.tag.findAll()
+    },
     Posts: (_, args, context) => {
       return context.db.models.post.findAll({
         ...QUERY_DEFUALTS,
@@ -39,7 +42,11 @@ const resolvers = {
         ...args
       })
     },
-    Post: (_, { id }, context) => context.db.models.post.findById(id),
+    Post: (_, { id }, context) => context.db.models.post.findById(id, {
+      include: [{
+        model: context.db.models.tag 
+      }]
+    }),
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
       const uid = id ? id : user.id
@@ -63,6 +70,10 @@ const resolvers = {
       return db.models.post.findById(post.id).then(p => {
         return p.getLikes()
       })
+    },
+    tags: (post, args, { db }) => {
+      console.log(post)
+      return post.getTags()
     }
   },
   User: {

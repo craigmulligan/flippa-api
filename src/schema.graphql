@@ -3,6 +3,14 @@ scalar Date
 # this is needed for upload to work
 scalar Upload
 
+type Tag {
+  id: ID!
+  title: String
+}
+
+input TagInput {
+  title: String!
+}
 
 type Post {
 	id: ID!
@@ -13,6 +21,7 @@ type Post {
 	user: User
 	likes: [User]
 	file: File
+  tags: [Tag]
 }
 
 input PostInput {
@@ -20,6 +29,7 @@ input PostInput {
 	description: String
 	price: String
 	fileId: String
+  tags: [ID]
 }
 
 type Follow {
@@ -68,6 +78,7 @@ type Query {
 	User(id: ID): User
 	Users(limit: Int, offset: Int, sort: [String]): [User]
 	Files: [File]
+  Tags: [Tag]
 }
 
 type Mutation {
@@ -80,4 +91,5 @@ type Mutation {
 	verifyCode(phoneNumber: String! verificationCode: String!): String
 	singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
+  createTag(tag: TagInput!): Tag
 }
