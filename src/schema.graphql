@@ -1,3 +1,9 @@
+scalar Url
+scalar Date
+# this is needed for upload to work
+scalar Upload
+
+
 type Post {
 	id: ID!
 	title: String
@@ -41,16 +47,11 @@ type User {
 
 type Notification {
 	id: ID!
-	type: String!
 	actor: User
 	user: User
-	meta: String!
+  sourceType: String!
+  post: Post
 }
-
-scalar Url
-scalar Date
-# this is needed for upload to work
-scalar Upload
 
 type File {
   id: ID!

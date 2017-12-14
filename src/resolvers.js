@@ -79,11 +79,24 @@ const resolvers = {
       return u.getLikes()
     },
     notifications: async ({ id }, args, { user, db }) => {
-      isAdminOrSelf(user, id)
+      //isAdminOrSelf(user, id)
       return db.models.notification.findAll({
         where: {
           userId: id
-        }
+        },
+        include: [
+          {
+            model: db.models.user
+          },
+          {
+            model: db.models.user,
+            as: 'actor'
+          },
+          {
+            model: db.models.post,
+            as: 'post'
+          }
+        ]
       })
     }
   },
@@ -100,17 +113,17 @@ const resolvers = {
       })
     },
     followUser: (_, { id }, { user, db }) => {
-      isLoggedIn(user)
+      // isLoggedIn(user)
       return db.models.follow.create({
-        userId: user.id,
+        userId: 2,
         subjectId: id
       })
     },
     likePost: (_, args, { user, db }) => {
-      isLoggedIn(user)
+      // isLoggedIn(user)
       return db.models.like.create({
         postId: args.id,
-        userId: user.id
+        userId: 2, 
       })
     },
     login: async (_, args, context) => {
