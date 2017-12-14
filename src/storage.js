@@ -43,7 +43,7 @@ const storeUpload = ({ stream, filename, mimetype, user }) => {
     stream
       .pipe(rStream)
       .on('finish', () => {
-        resolve({ filename, url: getPublicUrl(uploadPath) })
+        resolve({ name: filename, url: getPublicUrl(uploadPath) })
       })
       .on('error', reject)
   })

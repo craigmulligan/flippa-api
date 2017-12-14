@@ -25,10 +25,10 @@ const resolvers = {
         .findById(args.id)
         .then(u => u.getFollowing())
         .then(f => f.map(x => x.get().id))
-      
+
       if (following.length < 1) {
         return []
-      }  
+      }
 
       return db.models.post.findAll({
         ...QUERY_DEFUALTS,
@@ -42,11 +42,8 @@ const resolvers = {
         ...args
       })
     },
-    Post: (_, { id }, context) => context.db.models.post.findById(id, {
-      include: [{
-        model: context.db.models.tag 
-      }]
-    }),
+    Post: (_, { id }, context) =>
+      context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     User: (_, { id }, { user, db }) => {
       const uid = id ? id : user.id
@@ -59,20 +56,13 @@ const resolvers = {
     title: post => post.title,
     description: post => post.description,
     user: (post, args, context) => context.db.models.user.findById(post.userId),
-    file: (post, args, context) => {
-      if (post.fileId) {
-        return context.db.models.file.findById(post.fileId)
-      } else {
-        return ''
-      }
+    files: (post, args, context) => {
+       return post.getFiles()
     },
     likes: (post, args, { db }) => {
-      return db.models.post.findById(post.id).then(p => {
-        return p.getLikes()
-      })
+      return post.getLikes()
     },
     tags: (post, args, { db }) => {
-      console.log(post)
       return post.getTags()
     }
   },
@@ -122,10 +112,12 @@ const resolvers = {
     },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
-      return db.models.post.create({
+      const p = await db.models.post.create({
         ...input,
         userId: user.id
       })
+      await p.setTags(input.tags)
+      return p 
     },
     followUser: (_, { id }, { user, db }) => {
       // isLoggedIn(user)
@@ -138,7 +130,7 @@ const resolvers = {
       // isLoggedIn(user)
       return db.models.like.create({
         postId: args.id,
-        userId: 2, 
+        userId: 2
       })
     },
     login: async (_, args, context) => {

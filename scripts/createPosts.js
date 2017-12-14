@@ -13,21 +13,13 @@ for (let i = 0; i <= 100; i++){
     title: chance.word(),
     description: chance.paragraph(),
     price: chance.floating({min: 0, max: 100, fixed: 8}),
-    fileId: 1,
-    userId: chance.integer({min: 1, max: 20}),
-    tags: [
-      { id: 1 },
-      { id: 3 }
-    ]
+    userId: chance.integer({min: 1, max: 20})
   }
 }
 sequelize.sync({ force: false })
   .then((database) => {
     db = database 
     return db.models.tag.bulkCreate(tags)
-  })
-  .then(() => {
-    return db.models.post.create(posts[0])
   })
   .then(() => {
     return db.models.post.bulkCreate(posts, {
@@ -38,6 +30,23 @@ sequelize.sync({ force: false })
    return db.models.post.findAll()
   })
   .then((posts) => {
-    // console.log(posts)
+    const tagProms = posts.map(p => {
+      p.setTags([
+        chance.integer({ min: 1, max: 4 })
+      ])
+    })
+    const fileProms = posts.map(p => {
+      p.setTags([
+        chance.integer({ min: 1, max: 4 })
+      ])
+    })
+
+    return Promise.all([
+      ...tagProms,
+      ...fileProms
+    ])
+  })
+  .then(() => {
+    console.log('success')
     process.exit(0)
   })

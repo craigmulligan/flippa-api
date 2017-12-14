@@ -34,10 +34,6 @@ const Post = sequelize.define('post', {
   archived: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
-  },
-  fileId: {
-    type: Sequelize.INTEGER,
-    allowNull: true
   }
 })
 
@@ -87,18 +83,30 @@ User.hasMany(Post)
 
 const Tag = sequelize.define('tag', {
   title: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING, 
     unique: true
   }
 })
 
+const File = sequelize.define('file', {
+  url: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  name: {
+    type: Sequelize.STRING,
+  }
+}) 
+
+Post.hasMany(File)
+
 Post.belongsToMany(Tag, {
-  through: 'tagConnection' 
+  through: 'tagConnection'
 })
 
 Tag.belongsToMany(Post, {
   through: 'tagConnection'
-});
+})
 
 Notification.belongsTo(User)
 Notification.belongsTo(User, {

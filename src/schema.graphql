@@ -20,7 +20,7 @@ type Post {
 	createdAt: String! 
 	user: User
 	likes: [User]
-	file: File
+	files: [File]
   tags: [Tag]
 }
 
@@ -66,7 +66,7 @@ type Notification {
 type File {
   id: ID!
   url: String
-  filename: String
+  name: String
   mimetype: String
   encoding: String
 }
@@ -75,8 +75,7 @@ type Query {
   Feed(id: ID, limit: Int, offset: Int, sort: [String]): [Post]
 	Post(id: ID!): Post
 	Posts(limit: Int, offset: Int, sort: [String]): [Post]
-	User(id: ID): User
-	Users(limit: Int, offset: Int, sort: [String]): [User]
+	User(id: ID): User Users(limit: Int, offset: Int, sort: [String]): [User]
 	Files: [File]
   Tags: [Tag]
 }
