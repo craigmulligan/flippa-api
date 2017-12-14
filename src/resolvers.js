@@ -17,11 +17,15 @@ const resolvers = {
       })
     },
     Feed: async (_, args, { user, db }) => {
-      isLoggedIn(user)
+      // isLoggedIn(user)
       const following = await db.models.user
-        .findById(user.id)
+        .findById(args.id)
         .then(u => u.getFollowing())
         .then(f => f.map(x => x.get().id))
+      
+      if (following.length < 1) {
+        return []
+      }  
 
       return db.models.post.findAll({
         ...QUERY_DEFUALTS,

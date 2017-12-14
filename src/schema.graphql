@@ -62,7 +62,7 @@ type File {
 }
 
 type Query {
-  Feed(id: ID!): [Post]
+  Feed(id: ID, limit: Int, offset: Int, sort: [String]): [Post]
 	Post(id: ID!): Post
 	Posts(limit: Int, offset: Int, sort: [String]): [Post]
 	User(id: ID): User
