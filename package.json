@@ -8,6 +8,7 @@
     "debug": "^3.1.0",
     "dotenv": "4.0.0",
     "express-jwt": "5.3.0",
+    "graphql-type-json": "^0.1.4",
     "graphql-yoga": "^0.2.2",
     "jsonwebtoken": "8.1.0",
     "knex": "0.13.0",
@@ -27,7 +28,8 @@
   },
   "scripts": {
     "start": "node src/index",
-    "dev": "DEBUG=* nodemon src/index",
+    "dev": "nodemon src/index",
+    "test-watch": "jest --watch",
     "test": "jest",
     "lint": "eslint './src/**/*.js'",
     "prettier-check": "prettier-check --single-quote --no-semi --write 'src/**/*.js'",

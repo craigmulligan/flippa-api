@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize')
 const constants = require('../constants')
-const sequelize = new Sequelize(constants.DB_CONNECTION)
+const sequelize = new Sequelize(constants.DB_CONNECTION, {
+ logging: false 
+})
 
 const NOTIFICATION_TYPES = {
   follow: 'FOLLOW',

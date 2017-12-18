@@ -2116,6 +2116,10 @@ graphql-tools@^2.7.2:
     deprecated-decorator "^0.1.6"
     uuid "^3.1.0"
 
+graphql-type-json@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/graphql-type-json/-/graphql-type-json-0.1.4.tgz#89f13f5d32ce08c9a76c79fdf9c1968384d81a4e"
+
 graphql-yoga@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/graphql-yoga/-/graphql-yoga-0.2.2.tgz#57d73be235fc4f5411e286a6985b18cbace3dc0a"

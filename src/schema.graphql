@@ -2,6 +2,7 @@ scalar Url
 scalar Date
 # this is needed for upload to work
 scalar Upload
+scalar JSON
 
 type Tag {
   id: ID!
@@ -52,6 +53,7 @@ type User {
 	followers: [User]
   likes: [Post]
 	posts: [Post]
+	createdAt: String! 
 	notifications: [Notification]
 }
 
@@ -61,6 +63,8 @@ type Notification {
 	user: User
   sourceType: String!
   post: Post
+  read: Boolean 
+	createdAt: String! 
 }
 
 type File {
@@ -74,8 +78,11 @@ type File {
 type Query {
   Feed(id: ID, limit: Int, offset: Int, sort: [String]): [Post]
 	Post(id: ID!): Post
-	Posts(limit: Int, offset: Int, sort: [String]): [Post]
-	User(id: ID): User Users(limit: Int, offset: Int, sort: [String]): [User]
+	PostsByLikers(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
+	Posts(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
+	User(id: ID): User
+  Whoami: User
+  Users(limit: Int, offset: Int, sort: [String]): [User]
 	Files: [File]
   Tags: [Tag]
 }
@@ -91,4 +98,5 @@ type Mutation {
 	singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
   createTag(tag: TagInput!): Tag
+  markNotificationAsRead(id: [ID]!): [Notification]
 }

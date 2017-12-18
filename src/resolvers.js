@@ -1,6 +1,8 @@
 const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
-// const debug = require('debug')('resolvers')
+const debug = require('debug')('resolvers')
 const upload = require('./storage')
+const GraphQLJSON = require('graphql-type-json')
+
 const QUERY_DEFUALTS = {
   sortOrder: 'DESC',
   sortField: 'createdAt',
@@ -13,23 +15,45 @@ const resolvers = {
     Tags: (_, args, context) => {
       return context.db.models.tag.findAll()
     },
-    Posts: (_, args, context) => {
-      return context.db.models.post.findAll({
+    Posts: (_, args, { db }) => {
+      const { filter } = args
+      debug(filter)
+      return db.models.post.findAll({
         ...QUERY_DEFUALTS,
-        ...args
+        ...args,
+        ...(() => (
+          filter ? filter : {}
+        ))()
+     })
+    },
+    PostsByLikers: (_, args, { db }) => {
+      const { filter } = args
+      debug(filter)
+      return db.models.post.findAll({
+        ...QUERY_DEFUALTS,
+        ...args,
+        include: [
+          {
+            model: db.models.user,
+            as: 'likes',
+            where: {
+              id: args.filter.likers 
+            }
+          }
+        ]
       })
     },
     Feed: async (_, args, { user, db }) => {
       // isLoggedIn(user)
       const following = await db.models.user
-        .findById(args.id)
+        .findById(user.id)
         .then(u => u.getFollowing())
         .then(f => f.map(x => x.get().id))
 
       if (following.length < 1) {
         return []
       }
-
+      
       return db.models.post.findAll({
         ...QUERY_DEFUALTS,
         ...{
@@ -45,15 +69,14 @@ const resolvers = {
     Post: (_, { id }, context) =>
       context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
+    Whoami: (_, args, { db, user }) => db.models.user.findById(user.id),
     User: (_, { id }, { user, db }) => {
-      const uid = id ? id : user.id
+      uid = Boolean(id) ? id : user.id
       return db.models.user.findById(uid)
     },
     Files: (_, args, context) => context.db.models.file.findAll()
   },
   Post: {
-    id: post => post.id,
-    title: post => post.title,
     description: post => post.description,
     user: (post, args, context) => context.db.models.user.findById(post.userId),
     files: (post, args, context) => {
@@ -87,7 +110,7 @@ const resolvers = {
       //isAdminOrSelf(user, id)
       return db.models.notification.findAll({
         where: {
-          userId: id
+          actorId: user.id 
         },
         include: [
           {
@@ -105,6 +128,7 @@ const resolvers = {
       })
     }
   },
+  JSON: GraphQLJSON,
   Mutation: {
     updateUser: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
@@ -116,22 +140,56 @@ const resolvers = {
         ...input,
         userId: user.id
       })
-      await p.setTags(input.tags)
+      if (p.tags) {
+        await p.setTags(input.tags)
+      }
       return p 
     },
-    followUser: (_, { id }, { user, db }) => {
+    followUser: async (_, { id }, { user, db }) => {
       // isLoggedIn(user)
-      return db.models.follow.create({
-        userId: 2,
-        subjectId: id
-      })
+      try {
+        res = await db.models.follow.create({
+          userId: user.id,
+          subjectId: id
+        })
+      } catch(err) {
+        if (err.message == 'Validation error') {
+          const instance = await db.models.follow.find({
+            where: {
+              userId: user.id,
+              subjectId: id
+            }
+          })
+
+          return instance.destroy({ force: true }) 
+        } else {
+          return err
+        }
+      }
     },
-    likePost: (_, args, { user, db }) => {
-      // isLoggedIn(user)
-      return db.models.like.create({
-        postId: args.id,
-        userId: 2
-      })
+    likePost: async (_, args, { user, db }) => {
+      // isloggedin(user)
+      try {
+        res = await db.models.like.create({
+          postId: args.id,
+          userId: user.id 
+        })
+
+        return res
+      } catch (err) {
+        if (err.message == 'Validation error') {
+          const instance = await db.models.like.find({
+            where: {
+              postId: args.id,
+              userId: user.id
+            }
+          })
+
+          return instance.destroy({ force: true })
+        } else {
+          return err
+        }
+      } 
     },
     login: async (_, args, context) => {
       const code = await sendCode(args.phoneNumber)
@@ -160,6 +218,18 @@ const resolvers = {
         user
       })
       return db.models.file.create(data)
+    },
+    markNotificationAsRead: (_, { id }, { db, user }) => {
+      const ids = isArray(id) ? id : [id]
+      return db.models.notification.update({
+        read: true,
+      }, {
+        where: {
+          id: {
+            [db.Op.any]: args.ids.map(d => Number(d)) 
+          }
+        }
+      }) 
     }
   }
 }
