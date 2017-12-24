@@ -136,12 +136,20 @@ const resolvers = {
     },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
+      const {
+        files,
+        tags
+      } = input
+
       const p = await db.models.post.create({
         ...input,
         userId: user.id
       })
-      if (p.tags) {
-        await p.setTags(input.tags)
+      if (tags) {
+        await p.setTags(tags)
+      }
+      if (files) {
+        await p.setFiles(files)
       }
       return p 
     },

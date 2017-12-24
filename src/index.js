@@ -16,7 +16,6 @@ const start = async () => {
     const typeDefs = fs.readFileSync(schemaFile, 'utf8')
 
     const options = {
-      // cors: { origin: false },
       disableSubscriptions: true, // same as default value
       port: 8080,
       playgroundEndpoint: '/playground',

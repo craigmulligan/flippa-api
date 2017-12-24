@@ -100,7 +100,13 @@ const File = sequelize.define('file', {
   }
 }) 
 
-Post.hasMany(File)
+Post.belongsToMany(File, {
+  through: 'fileConnection'
+})
+
+File.belongsToMany(Post, {
+  through: 'fileConnection'
+})
 
 Post.belongsToMany(Tag, {
   through: 'tagConnection'

@@ -5,6 +5,7 @@ const chance = new Chance()
 const tags = require('../src/db/tags').map(t => ({
   title: t
 }))
+const files = require('./files')
 
 let posts = []
 let db = []
@@ -12,35 +13,38 @@ for (let i = 0; i <= 100; i++){
   posts[i] = { 
     title: chance.word(),
     description: chance.paragraph(),
-    price: chance.floating({min: 0, max: 100, fixed: 8}),
-    userId: chance.integer({min: 1, max: 20})
+    price: chance.floating({min: 0, max: 100, fixed: 2}),
+    userId: chance.integer({min: 1, max: 20}),
   }
 }
 sequelize.sync({ force: false })
   .then((database) => {
     db = database 
-    return db.models.tag.bulkCreate(tags)
+    return Promise.all([
+      db.models.tag.bulkCreate(tags),
+      db.models.file.bulkCreate(files),
+    ]
+    )
   })
   .then(() => {
-    return db.models.post.bulkCreate(posts, {
-      include: [ db.models.tag ]
-    }) 
+    return db.models.post.bulkCreate(posts) 
   })
   .then(() => {
    return db.models.post.findAll()
   })
   .then((posts) => {
     const tagProms = posts.map(p => {
-      p.setTags([
+      return p.setTags([
         chance.integer({ min: 1, max: 4 })
       ])
     })
     const fileProms = posts.map(p => {
-      p.setTags([
-        chance.integer({ min: 1, max: 4 })
+      return p.setFiles([
+        chance.integer({ min: 1, max: 2 })
       ])
     })
-
+    
+    console.log(fileProms)
     return Promise.all([
       ...tagProms,
       ...fileProms

@@ -29,8 +29,8 @@ input PostInput {
 	title: String
 	description: String
 	price: String
-	fileId: String
   tags: [ID]
+  files: [ID]
 }
 
 type Follow {
@@ -77,7 +77,7 @@ type File {
 
 type Query {
   Feed(id: ID, limit: Int, offset: Int, sort: [String]): [Post]
-	Post(id: ID!): Post
+	Post(id: ID): Post
 	PostsByLikers(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
 	Posts(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
 	User(id: ID): User
