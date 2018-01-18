@@ -1,4 +1,4 @@
-const { sendCode, getToken, isAdminOrSelf, isLoggedIn } = require('./auth')
+const { sendCode, getToken, isLoggedIn, isAdminOrSelf } = require('./auth')
 const debug = require('debug')('resolvers')
 const upload = require('./storage')
 const GraphQLJSON = require('graphql-type-json')
@@ -21,10 +21,8 @@ const resolvers = {
       return db.models.post.findAll({
         ...QUERY_DEFUALTS,
         ...args,
-        ...(() => (
-          filter ? filter : {}
-        ))()
-     })
+        ...(() => (filter ? filter : {}))()
+      })
     },
     PostsByLikers: (_, args, { db }) => {
       const { filter } = args
@@ -37,14 +35,14 @@ const resolvers = {
             model: db.models.user,
             as: 'likes',
             where: {
-              id: args.filter.likers 
+              id: args.filter.likers
             }
           }
         ]
       })
     },
     Feed: async (_, args, { user, db }) => {
-      // isLoggedIn(user)
+      isLoggedIn(user)
       const following = await db.models.user
         .findById(user.id)
         .then(u => u.getFollowing())
@@ -53,7 +51,7 @@ const resolvers = {
       if (following.length < 1) {
         return []
       }
-      
+
       return db.models.post.findAll({
         ...QUERY_DEFUALTS,
         ...{
@@ -66,13 +64,11 @@ const resolvers = {
         ...args
       })
     },
-    Post: (_, { id }, context) =>
-      context.db.models.post.findById(id),
+    Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     Whoami: (_, args, { db, user }) => db.models.user.findById(user.id),
     User: (_, { id }, { user, db }) => {
-      uid = Boolean(id) ? id : user.id
-      return db.models.user.findById(uid)
+      return db.models.user.findById(id || user.id)
     },
     Files: (_, args, context) => context.db.models.file.findAll()
   },
@@ -80,7 +76,7 @@ const resolvers = {
     description: post => post.description,
     user: (post, args, context) => context.db.models.user.findById(post.userId),
     files: (post, args, context) => {
-       return post.getFiles()
+      return post.getFiles()
     },
     likes: (post, args, { db }) => {
       return post.getLikes()
@@ -107,10 +103,10 @@ const resolvers = {
       return u.getLikes()
     },
     notifications: async ({ id }, args, { user, db }) => {
-      //isAdminOrSelf(user, id)
+      isAdminOrSelf(user, id)
       return db.models.notification.findAll({
         where: {
-          actorId: user.id 
+          actorId: user.id
         },
         include: [
           {
@@ -136,10 +132,7 @@ const resolvers = {
     },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
-      const {
-        files,
-        tags
-      } = input
+      const { files, tags } = input
 
       const p = await db.models.post.create({
         ...input,
@@ -151,7 +144,7 @@ const resolvers = {
       if (files) {
         await p.setFiles(files)
       }
-      return p 
+      return p
     },
     followUser: async (_, { id }, { user, db }) => {
       // isLoggedIn(user)
@@ -160,7 +153,7 @@ const resolvers = {
           userId: user.id,
           subjectId: id
         })
-      } catch(err) {
+      } catch (err) {
         if (err.message == 'Validation error') {
           const instance = await db.models.follow.find({
             where: {
@@ -169,18 +162,18 @@ const resolvers = {
             }
           })
 
-          return instance.destroy({ force: true }) 
+          return instance.destroy({ force: true })
         } else {
           return err
         }
       }
     },
     likePost: async (_, args, { user, db }) => {
-      // isloggedin(user)
+      isloggedin(user)
       try {
         res = await db.models.like.create({
           postId: args.id,
-          userId: user.id 
+          userId: user.id
         })
 
         return res
@@ -197,7 +190,7 @@ const resolvers = {
         } else {
           return err
         }
-      } 
+      }
     },
     login: async (_, args, context) => {
       const code = await sendCode(args.phoneNumber)
@@ -229,15 +222,18 @@ const resolvers = {
     },
     markNotificationAsRead: (_, { id }, { db, user }) => {
       const ids = isArray(id) ? id : [id]
-      return db.models.notification.update({
-        read: true,
-      }, {
-        where: {
-          id: {
-            [db.Op.any]: args.ids.map(d => Number(d)) 
+      return db.models.notification.update(
+        {
+          read: true
+        },
+        {
+          where: {
+            id: {
+              [db.Op.any]: args.ids.map(d => Number(d))
+            }
           }
         }
-      }) 
+      )
     }
   }
 }

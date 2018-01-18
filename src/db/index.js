@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const constants = require('../constants')
 const sequelize = new Sequelize(constants.DB_CONNECTION, {
- logging: false 
+  logging: false
 })
 
 const NOTIFICATION_TYPES = {
@@ -85,7 +85,7 @@ User.hasMany(Post)
 
 const Tag = sequelize.define('tag', {
   title: {
-    type: Sequelize.STRING, 
+    type: Sequelize.STRING,
     unique: true
   }
 })
@@ -96,9 +96,9 @@ const File = sequelize.define('file', {
     unique: true
   },
   name: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING
   }
-}) 
+})
 
 Post.belongsToMany(File, {
   through: 'fileConnection'
