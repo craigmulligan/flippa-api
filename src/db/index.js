@@ -1,6 +1,9 @@
 const Sequelize = require('sequelize')
 const constants = require('../constants')
-const sequelize = new Sequelize(constants.DB_CONNECTION)
+
+const sequelize = new Sequelize(constants.DB_CONNECTION, {
+  logging: false
+})
 
 const NOTIFICATION_TYPES = {
   follow: 'FOLLOW',
@@ -34,10 +37,6 @@ const Post = sequelize.define('post', {
   archived: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
-  },
-  fileId: {
-    type: Sequelize.INTEGER,
-    allowNull: true
   }
 })
 
@@ -46,53 +45,36 @@ sequelize.define('file', {
 })
 
 const Like = sequelize.define('like', {
-  userId: {
+  id: {
     type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
+    primaryKey: true,
+    autoIncrement: true
+  },
+  userId: {
+    type: Sequelize.INTEGER
   },
   postId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: Post,
-      key: 'id'
-    }
+    type: Sequelize.INTEGER
   }
 })
 
 const Follow = sequelize.define('follow', {
-  userId: {
+  id: {
     type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
+    primaryKey: true,
+    autoIncrement: true
+  },
+  userId: {
+    type: Sequelize.INTEGER
   },
   subjectId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
+    type: Sequelize.INTEGER
   }
 })
 
-const Nofitcation = sequelize.define('notification', {
-  type: {
+const Notification = sequelize.define('notification', {
+  sourceType: {
     type: Sequelize.STRING
-  },
-  actorId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id'
-    }
-  },
-  meta: {
-    type: Sequelize.JSONB,
-    allowNull: true
   },
   read: {
     type: Sequelize.BOOLEAN,
@@ -100,30 +82,97 @@ const Nofitcation = sequelize.define('notification', {
   }
 })
 
-const Category = sequelize.define('category', {
+User.hasMany(Post)
+
+const Tag = sequelize.define('tag', {
   title: {
-    type: Sequelize.TEXT
+    type: Sequelize.STRING,
+    unique: true
   }
 })
 
-Post.belongsTo(User)
-Post.belongsTo(Category)
-Nofitcation.belongsTo(User)
+const File = sequelize.define('file', {
+  url: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  name: {
+    type: Sequelize.STRING
+  }
+})
+
+Post.belongsToMany(File, {
+  through: 'fileConnection'
+})
+
+File.belongsToMany(Post, {
+  through: 'fileConnection'
+})
+
+Post.belongsToMany(Tag, {
+  through: 'tagConnection'
+})
+
+Tag.belongsToMany(Post, {
+  through: 'tagConnection'
+})
+
+Notification.belongsTo(User)
+Notification.belongsTo(User, {
+  as: 'actor'
+})
+
+Notification.belongsTo(Post, {
+  as: 'post'
+})
+
+Post.belongsToMany(User, {
+  as: 'likes',
+  foreignKey: 'postId',
+  through: {
+    model: Like
+  }
+})
+
+User.belongsToMany(Post, {
+  as: 'likes',
+  foreignKey: 'userId',
+  through: {
+    model: Like
+  }
+})
+
+User.belongsToMany(User, {
+  as: 'followers',
+  foreignKey: 'subjectId',
+  through: {
+    model: Follow
+  }
+})
+
+User.belongsToMany(User, {
+  as: 'following',
+  foreignKey: 'userId',
+  through: {
+    model: Follow
+  }
+})
 
 Follow.addHook('afterCreate', 'follow', follow => {
-  Nofitcation.create({
+  Notification.create({
     actorId: follow.userId,
     userId: follow.subjectId,
-    type: NOTIFICATION_TYPES.follow
+    sourceType: NOTIFICATION_TYPES.follow
   })
 })
 
 Like.addHook('afterCreate', 'like', async like => {
   const post = await Post.find({ where: { id: like.postId } })
-  Nofitcation.create({
+  Notification.create({
     actorId: like.userId,
     userId: post.userId,
-    type: NOTIFICATION_TYPES.like
+    sourceType: NOTIFICATION_TYPES.like,
+    postId: post.id
   })
 })
 

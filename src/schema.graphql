@@ -1,18 +1,36 @@
+scalar Url
+scalar Date
+# this is needed for upload to work
+scalar Upload
+scalar JSON
+
+type Tag {
+  id: ID!
+  title: String
+}
+
+input TagInput {
+  title: String!
+}
+
 type Post {
 	id: ID!
 	title: String
 	description: String
-	created: Date
+  price: String
+	createdAt: String! 
 	user: User
 	likes: [User]
-	file: File
+	files: [File]
+  tags: [Tag]
 }
 
 input PostInput {
 	title: String
 	description: String
 	price: String
-	fileId: String
+  tags: [ID]
+  files: [ID]
 }
 
 type Follow {
@@ -20,47 +38,57 @@ type Follow {
 	userId: ID
 }
 
+input UserInput {
+ displayName: String
+ phoneNumber: String
+ avatar: Url
+}
+
 type User {
 	id: ID!
 	displayName: String
-	phoneNumber: String!
+	phoneNumber: String
 	avatar: Url
+  following: [User]
 	followers: [User]
+  likes: [Post]
 	posts: [Post]
+	createdAt: String! 
 	notifications: [Notification]
 }
 
 type Notification {
 	id: ID!
-	type: String!
 	actor: User
 	user: User
-	meta: String!
+  sourceType: String!
+  post: Post
+  read: Boolean 
+	createdAt: String! 
 }
-
-scalar Url
-scalar Date
-# this is needed for upload to work
-scalar Upload
 
 type File {
   id: ID!
   url: String
-  filename: String
+  name: String
   mimetype: String
   encoding: String
 }
 
 type Query {
-	Post(id: ID!): Post
-	Posts(limit: Int, sortField: String, sortOrder: String): [Post]
-	User(id: ID!): User
-	Users(limit: Int, sortField: String, sortOrder: String): [User]
+  Feed(id: ID, limit: Int, offset: Int, sort: [String]): [Post]
+	Post(id: ID): Post
+	PostsByLikers(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
+	Posts(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
+	User(id: ID): User
+  Whoami: User
+  Users(limit: Int, offset: Int, sort: [String]): [User]
 	Files: [File]
+  Tags: [Tag]
 }
 
 type Mutation {
-	createUser(displayName: String): User
+	updateUser(input: UserInput): User
 	createPost(input: PostInput): Post
 	followUser(id: ID!): Follow
 	deletePost(id: ID!): Post
@@ -69,4 +97,6 @@ type Mutation {
 	verifyCode(phoneNumber: String! verificationCode: String!): String
 	singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
+  createTag(tag: TagInput!): Tag
+  markNotificationAsRead(id: [ID]!): [Notification]
 }

@@ -15,15 +15,25 @@ function getPublicUrl(filename) {
   return 'https://storage.googleapis.com/' + bucketName + '/' + filename
 }
 
-const processUpload = async upload => {
-  const data = await upload
-  return await storeUpload(data)
+const processUpload = async ({ file, user }) => {
+  const data = await file
+  return await storeUpload({
+    ...data,
+    user
+  })
 }
 
-const storeUpload = ({ stream, filename, mimetype }) => {
-  debug(`uploading ${filename}`)
+const storeUpload = ({ stream, filename, mimetype, user }) => {
+  const uploadPath = `${user.id}/${filename}`
+  debug(`uploading ${uploadPath}`)
+  debug({
+    stream,
+    filename,
+    mimetype
+  })
+
   return new Promise((resolve, reject) => {
-    const file = bucket.file(filename)
+    const file = bucket.file(uploadPath)
     const rStream = file.createWriteStream({
       metadata: {
         contentType: mimetype
@@ -33,11 +43,9 @@ const storeUpload = ({ stream, filename, mimetype }) => {
     stream
       .pipe(rStream)
       .on('finish', () => {
-        resolve({ filename, url: getPublicUrl(filename) })
+        resolve({ name: filename, url: getPublicUrl(uploadPath) })
       })
-      .on('error', err => {
-        reject(err)
-      })
+      .on('error', reject)
   })
 }
 
