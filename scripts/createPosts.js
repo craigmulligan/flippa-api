@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Chance = require('chance')
 const constants = require('../src/constants')
 const sequelize = require('../src/db')

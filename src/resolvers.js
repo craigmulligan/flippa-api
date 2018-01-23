@@ -144,6 +144,7 @@ const resolvers = {
       if (files) {
         await p.setFiles(files)
       }
+      console.log(p)
       return p
     },
     followUser: async (_, { id }, { user, db }) => {
@@ -169,7 +170,7 @@ const resolvers = {
       }
     },
     likePost: async (_, args, { user, db }) => {
-      isloggedin(user)
+      isLoggedIn(user)
       try {
         res = await db.models.like.create({
           postId: args.id,
@@ -218,6 +219,8 @@ const resolvers = {
         file,
         user
       })
+      
+      console.log(data)
       return db.models.file.create(data)
     },
     markNotificationAsRead: (_, { id }, { db, user }) => {
