@@ -19,7 +19,7 @@ deploy:
   keyfile: gce.json
   project: flippa-35259
   verbosity: debug
-  on: mvp 
+  on: master 
 before_install:
 - openssl aes-256-cbc -K $encrypted_18339f154d6a_key -iv $encrypted_18339f154d6a_iv
   -in gce.json.enc -out gce.json -d
