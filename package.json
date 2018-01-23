@@ -43,6 +43,9 @@
     "type": "git",
     "url": "https://github.com/hobochild/flippa-api.git"
   },
+  "engines": {
+    "node": "9.x"
+  },
   "release": {
     "publish": "@semantic-release/github"
   }
