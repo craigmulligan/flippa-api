@@ -219,7 +219,7 @@ const resolvers = {
         file,
         user
       })
-      
+
       console.log(data)
       return db.models.file.create(data)
     },
