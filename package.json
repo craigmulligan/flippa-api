@@ -5,6 +5,8 @@
   "main": "src/index.js",
   "dependencies": {
     "@google-cloud/storage": "1.4.0",
+    "awesome-phonenumber": "^2.2.4",
+    "axios": "^0.17.1",
     "debug": "^3.1.0",
     "dotenv": "4.0.0",
     "express-jwt": "5.3.0",
@@ -14,6 +16,7 @@
     "knex": "0.13.0",
     "nodemon": "1.12.1",
     "pg": "6.4.2",
+    "request-promise": "^4.2.2",
     "sequelize": "4.22.5",
     "twilio": "3.9.2"
   },
@@ -27,7 +30,7 @@
     "semantic-release": "^8.2.0"
   },
   "scripts": {
-    "start": "node src/index",
+    "start": "NODE_ENV=production node src/index",
     "dev": "nodemon src/index",
     "test-watch": "jest --watch",
     "test": "jest",

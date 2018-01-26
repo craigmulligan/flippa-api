@@ -11,5 +11,6 @@ module.exports = {
   GCS_PROJECT_ID: process.env.GCS_PROJECT_ID || 'flippa-35259',
   GOOGLE_APPLICATION_CREDENTIALS:
     process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-    path.resolve(`${__dirname}/gcs-keyfile.json`)
+    path.resolve(`${__dirname}/gcs-keyfile.json`),
+  CLICKATELL_API_KEY: process.env.CLICKATELL_API_KEY 
 }

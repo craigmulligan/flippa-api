@@ -1,7 +1,19 @@
 const Sequelize = require('sequelize')
 const constants = require('../constants')
 
-const sequelize = new Sequelize(constants.DB_CONNECTION, {
+const config = {
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
+  database: process.env.SQL_DATABASE
+};
+
+if (process.env.INSTANCE_CONNECTION_NAME && process.env.NODE_ENV === 'production') {
+  config.host = `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`;
+}
+
+const sequelize = new Sequelize(config.database, config.user, config.password, {
+  host: config.host, 
+  dialect: 'postgres',
   logging: false
 })
 
@@ -107,6 +119,15 @@ Post.belongsToMany(File, {
 
 File.belongsToMany(Post, {
   through: 'fileConnection'
+})
+
+
+File.belongsTo(User, {
+  through: 'fileConnection',
+})
+
+File.belongsTo(User, {
+  through: 'fileConnection',
 })
 
 Post.belongsToMany(Tag, {

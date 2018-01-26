@@ -219,8 +219,7 @@ const resolvers = {
         file,
         user
       })
-
-      console.log(data)
+      
       return db.models.file.create(data)
     },
     markNotificationAsRead: (_, { id }, { db, user }) => {

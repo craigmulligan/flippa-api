@@ -10,7 +10,7 @@ const { middleware } = require('./auth')
 
 const start = async () => {
   try {
-    const db = await DB.sync({ force: false })
+    const db = await DB.sync({ force: false }).catch(console.error)
 
     const schemaFile = path.join(__dirname, 'schema.graphql')
     const typeDefs = fs.readFileSync(schemaFile, 'utf8')
