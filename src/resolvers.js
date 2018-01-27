@@ -4,8 +4,9 @@ const upload = require('./storage')
 const GraphQLJSON = require('graphql-type-json')
 
 const QUERY_DEFUALTS = {
-  sortOrder: 'DESC',
-  sortField: 'createdAt',
+  order: [
+    ['createdAt', 'DESC']
+  ],
   limit: 100,
   offset: 0
 }
@@ -86,6 +87,16 @@ const resolvers = {
     }
   },
   User: {
+    avatar: (user, _, { db }) => {
+      console.log('user.avatar is deprecated use user.file instead')
+    },
+    file: (user, _, { db }) => {
+      return db.models.file.find({
+        where: { 
+          userId: user.id
+        } 
+      })
+    },
     posts: ({ id }, args, { db }) => {
       return db.models.post.findAll({
         where: {
@@ -128,7 +139,11 @@ const resolvers = {
   Mutation: {
     updateUser: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
-      return db.models.user.update(input, { where: { id: user.id } })
+      const instance = await db.models.user.findById(user.id)
+      if (input.fileId) {
+        await instance.setFile(input.fileId)
+      }
+      return instance.update(input)
     },
     createPost: async (_, { input }, { db, user }) => {
       isLoggedIn(user)
@@ -144,13 +159,12 @@ const resolvers = {
       if (files) {
         await p.setFiles(files)
       }
-      console.log(p)
       return p
     },
     followUser: async (_, { id }, { user, db }) => {
-      // isLoggedIn(user)
+      isLoggedIn(user)
       try {
-        res = await db.models.follow.create({
+        await db.models.follow.create({
           userId: user.id,
           subjectId: id
         })
@@ -220,6 +234,7 @@ const resolvers = {
         user
       })
       
+      console.log({ data })
       return db.models.file.create(data)
     },
     markNotificationAsRead: (_, { id }, { db, user }) => {

@@ -94,7 +94,6 @@ const Notification = sequelize.define('notification', {
   }
 })
 
-User.hasMany(Post)
 
 const Tag = sequelize.define('tag', {
   title: {
@@ -113,21 +112,15 @@ const File = sequelize.define('file', {
   }
 })
 
+User.hasMany(Post)
+User.hasOne(File)
+
 Post.belongsToMany(File, {
   through: 'fileConnection'
 })
 
 File.belongsToMany(Post, {
   through: 'fileConnection'
-})
-
-
-File.belongsTo(User, {
-  through: 'fileConnection',
-})
-
-File.belongsTo(User, {
-  through: 'fileConnection',
 })
 
 Post.belongsToMany(Tag, {

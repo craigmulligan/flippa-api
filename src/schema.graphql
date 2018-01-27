@@ -42,6 +42,7 @@ input UserInput {
  displayName: String
  phoneNumber: String
  avatar: Url
+ fileId: ID 
 }
 
 type User {
@@ -49,6 +50,7 @@ type User {
 	displayName: String
 	phoneNumber: String
 	avatar: Url
+  file: File 
   following: [User]
 	followers: [User]
   likes: [Post]
