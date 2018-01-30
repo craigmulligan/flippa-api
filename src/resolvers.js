@@ -68,8 +68,18 @@ const resolvers = {
     Post: (_, { id }, context) => context.db.models.post.findById(id),
     Users: (_, args, context) => context.db.models.user.findAll(),
     Whoami: (_, args, { db, user }) => db.models.user.findById(user.id),
-    User: (_, { id }, { user, db }) => {
-      return db.models.user.findById(id || user.id)
+    User: (_, { id, phoneNumber }, { user, db }) => {
+      console.log({ id, phoneNumber })
+      if (id) {
+        return db.models.user.findById(id || user.id)
+      }
+      if (phoneNumber) {
+        return db.models.user.find({
+          where: {
+            phoneNumber: phoneNumber
+          }
+        })
+      }
     },
     Files: (_, args, context) => context.db.models.file.findAll()
   },

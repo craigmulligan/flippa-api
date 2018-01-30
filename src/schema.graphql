@@ -47,6 +47,7 @@ input UserInput {
 
 type User {
 	id: ID!
+  verificationCode: String
 	displayName: String
 	phoneNumber: String
 	avatar: Url
@@ -82,7 +83,7 @@ type Query {
 	Post(id: ID): Post
 	PostsByLikers(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
 	Posts(limit: Int, offset: Int, sort: [String] filter: JSON): [Post]
-	User(id: ID): User
+	User(id: ID, phoneNumber: String): User
   Whoami: User
   Users(limit: Int, offset: Int, sort: [String]): [User]
 	Files: [File]
